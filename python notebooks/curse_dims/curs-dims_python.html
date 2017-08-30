@@ -12783,7 +12783,7 @@ $$ y_n \sim Bernoulli(0.8) $$<p>Two questions frame the discussion:</p>
 <p>In contrast, the probability of any given sequence with 80 successes is only $0.8^{80}0.2^{20}$, or about $2\times10^{- 22}$. The chance of 100 straight successes is a whopping $10^{12}$ times more probable than any specific sequence with 80 successes and 20 failures!</p>
 <p>On the other hand, there are a lot of sequences with 80 successes and 20 failures—a total of ${100}\choose{80}$ of them to be exact (around $10^{20}$). So even though any given sequence of 80 success and 20 failures is relatively improbable, there are so many such sequences that their overall mass is higher than that of the unique sequence with 100 success, because $10^{20}\times2\times10^{- 22} $ is a lot bigger than $1\times2\times10^{- 10} $. Same goes for sequences with 81 successes; each such sequence is more probable than any sequence with 80 successes, but ${100}\choose{81}$ is smaller than ${100}\choose{80}$.</p>
 <p>The binomial distribution is the distribution of counts, so that if $y_1,....y_N$ is such that each $y_n \sim Bernoulli(\theta)$, then</p>
-$$ (y_1 + ⋯ +y_N) \sim Binomial(N,\theta) $$<p>.</p>
+$$ (y_1 + ... +y_N) \sim Binomial(N,\theta) $$<p>.</p>
 <p>The binomial aggregates the multiple trials by multiplying through by the possible ways in which $y$ successes can arise in $N$ trials, namely</p>
 $$ Binomial(y \vert N, \theta) = {N \choose y} \theta^{y}(1-\theta)^{(N-y)} $$<p>,</p>
 <p>where the binomial coefficient that normalizes the distribution is defined as the number of binary sequences of length NN that contain exactly $y$ elements equal to 1,</p>
