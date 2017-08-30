@@ -1,0 +1,108 @@
+<!doctype html>
+
+<title>CodeMirror: Stan mode</title>
+<meta charset="utf-8"/>
+<link rel=stylesheet href="../../doc/docs.css">
+
+<link rel="stylesheet" href="../../lib/codemirror.css">
+<script src="../../lib/codemirror.js"></script>
+<script src="../../addon/edit/matchbrackets.js"></script>
+<link rel="stylesheet" href="../../addon/hint/show-hint.css">
+<script src="../../addon/hint/show-hint.js"></script>
+<script src="stan.js"></script>
+<style>.CodeMirror {border: 2px inset #dee;}</style>
+<div id=nav>
+  <a href="http://codemirror.net"><h1>CodeMirror</h1><img id=logo src="../../doc/logo.png"></a>
+
+  <ul>
+    <li><a href="../../index.html">Home</a>
+    <li><a href="../../doc/manual.html">Manual</a>
+    <li><a href="https://github.com/codemirror/codemirror">Code</a>
+  </ul>
+  <ul>
+    <li><a href="../index.html">Language modes</a>
+    <li><a class=active href="#">Stan</a>
+  </ul>
+</div>
+
+<article>
+  <h2>Stan mode</h2>
+
+  <div>
+    <textarea id="stan-code">
+/* Stan demo code */
+data {
+  int<lower=1> N;
+  int<lower=1> N_income;
+  int<lower=1, upper=N_income> income[N];
+
+  vector[N] x;
+  int y[N];
+}
+
+parameters {
+  real mu_alpha;
+  real<lower=0> sigma_alpha;
+  vector[N_income] alpha_income;
+
+  real mu_beta;
+  real<lower=0> sigma_beta;
+  vector[N_income] beta_income;
+}
+
+model {
+  mu_alpha ~ normal(0, 2.5);
+  sigma_alpha ~ normal(0, 2.5);
+  alpha_income ~ normal(mu_alpha, sigma_alpha);
+
+  mu_beta ~ normal(0,2.5);
+  sigma_beta ~ normal(0, 2.5);
+  beta_income ~ normal(mu_beta, sigma_beta);
+
+  y ~ bernoulli_logit(beta_income[income] .* x + alpha_income[income]);
+
+
+
+}
+
+generated quantities {
+  real p_ppc = 0;
+
+  vector[N_income] p_income_ppc = rep_vector(0, N_income);
+  {
+    vector[N_income] income_counts = rep_vector(0, N_income);
+
+    for(n in 1:N) {
+      real logit_theta = beta_income[income[n]] * x[n] + alpha_income[income[n]];
+      if (bernoulli_logit_rng(logit_theta)) {
+        p_ppc = p_ppc + 1;
+        p_income_ppc[income[n]] = p_income_ppc[income[n]] + 1;
+      }
+      income_counts[income[n]] = income_counts[income[n]] + 1;
+    }
+
+    p_ppc = p_ppc/N;
+    p_income_ppc = p_income_ppc ./ income_counts;
+      }
+
+}
+
+
+    </textarea></div>
+
+
+
+  <script>
+    var cEditor = CodeMirror.fromTextArea(document.getElementById("stan-code"), {
+      lineNumbers: true,
+      matchBrackets: true,
+      mode: "text/x-stan",
+      extraKeys: {"Ctrl-Space": "autocomplete"}
+    });
+
+  </script>
+
+
+  <p><strong>MIME types defined:</strong> <code>text/x-stan</code>
+    Stan </p>
+</article>
