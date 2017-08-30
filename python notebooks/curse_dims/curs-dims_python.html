@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>Typical Sets and Curse of Dimensionality</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>curs-dims</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -12779,11 +12779,11 @@ $$ y_n \sim Bernoulli(0.8) $$<p>Two questions frame the discussion:</p>
 </li>
 </ol>
 <p>Let’s answer the second question first. If you have an 80% chance of success and make 100 attemps, the expected number of successes is just 80 (in general, it’s the probability of success times the number of attempts).</p>
-<p>Then why is the most likely outcome 100 straight successes? The probability of 100 straight successes is $0.8^{100}$ or about $2\times10^{−10}$.</p>
-<p>In contrast, the probability of any given sequence with 80 successes is only $0.8^{80}0.2^{20}$, or about $2\times10^{-22}$. The chance of 100 straight successes is a whopping $10^{12}$ times more probable than any specific sequence with 80 successes and 20 failures!</p>
-<p>On the other hand, there are a lot of sequences with 80 successes and 20 failures—a total of ${100}\choose{80}$ of them to be exact (around $10^20$). So even though any given sequence of 80 success and 20 failures is relatively improbable, there are so many such sequences that their overall mass is higher than that of the unique sequence with 100 success, because $10^{20}\times2\times10^{−22} $ is a lot bigger than $1\times2\times10^{−10} $. Same goes for sequences with 81 successes; each such sequence is more probable than any sequence with 80 successes, but ${100}\choose{81}$ is smaller than ${100}\choose{80}$.</p>
+<p>Then why is the most likely outcome 100 straight successes? The probability of 100 straight successes is $0.8^{100}$ or about $2\times10^{- 10}$.</p>
+<p>In contrast, the probability of any given sequence with 80 successes is only $0.8^{80}0.2^{20}$, or about $2\times10^{- 22}$. The chance of 100 straight successes is a whopping $10^{12}$ times more probable than any specific sequence with 80 successes and 20 failures!</p>
+<p>On the other hand, there are a lot of sequences with 80 successes and 20 failures—a total of ${100}\choose{80}$ of them to be exact (around $10^{20}$). So even though any given sequence of 80 success and 20 failures is relatively improbable, there are so many such sequences that their overall mass is higher than that of the unique sequence with 100 success, because $10^{20}\times2\times10^{- 22} $ is a lot bigger than $1\times2\times10^{- 10} $. Same goes for sequences with 81 successes; each such sequence is more probable than any sequence with 80 successes, but ${100}\choose{81}$ is smaller than ${100}\choose{80}$.</p>
 <p>The binomial distribution is the distribution of counts, so that if $y_1,....y_N$ is such that each $y_n \sim Bernoulli(\theta)$, then</p>
-$$ (y_1+⋯+y_N) \sim Binomial(N,\theta) $$<p>.</p>
+$$ (y_1 + ⋯ +y_N) \sim Binomial(N,\theta) $$<p>.</p>
 <p>The binomial aggregates the multiple trials by multiplying through by the possible ways in which $y$ successes can arise in $N$ trials, namely</p>
 $$ Binomial(y \vert N, \theta) = {N \choose y} \theta^{y}(1-\theta)^{(N-y)} $$<p>,</p>
 <p>where the binomial coefficient that normalizes the distribution is defined as the number of binary sequences of length NN that contain exactly $y$ elements equal to 1,</p>
@@ -16025,8 +16025,8 @@ uCRJklTQ/wDf3EHdxKXRQgAAAABJRU5ErkJggg==
 <p>All of the computations of interest in Bayesian statistics are formulated as posterior expectations. For example, Bayesian parameter estimates minimizing expected square error are expectations of the value of a parameter $\theta$ in the posterior (conditioned on data $y$),</p>
 $$ \hat\theta = \mathbb{E}[\theta | y] = \int_{\Theta}\theta p(\theta | y) d\theta$$<p>,</p>
 <p>where we integrate over the legal values of $\theta \in \Theta$</p>
-<p>Posterior event probabilities are expectations of the indicator function $I[\theta \in E]$ that indicates whether a parameter value $\theta$ is in the event $$$,</p>
-$$Pr[E∣y] = \mathbb{E}[I[\theta \in E]∣y] = \int_{\Theta}I[\theta \in E] p(\theta | y) d\theta $$<p>Rather than integrating over the support $\theta$ of $\Theta$ in the posterior, it suffices to integrate over the typical set (the typical set is not the only such set; see the exercises for a discussion of the highest probability set). That is, if $\Theta$ is the support for a density$p(\theta)$, then the typical set $T \subseteq \Theta$ has the property that for “well-behaved” functions,</p>
+<p>Posterior event probabilities are expectations of the indicator function $I[\theta \in E]$ that indicates whether a parameter value $\theta$ is in the event,</p>
+$$ Pr[E | y] = \mathbb{E}[I[\theta \in E ]| y] = \int_{\Theta}I[\theta \in E] p(\theta | y) d\theta $$<p>Rather than integrating over the support $\theta$ of $\Theta$ in the posterior, it suffices to integrate over the typical set (the typical set is not the only such set; see the exercises for a discussion of the highest probability set). That is, if $\Theta$ is the support for a density$p(\theta)$, then the typical set $T \subseteq \Theta$ has the property that for “well-behaved” functions,</p>
 $$ \mathbb{E}[f(\theta) | y] = \int_{\Theta}f(\theta) p(\theta | y) d\theta \approx \int_{T}f(\theta) p(\theta | y) d\theta $$<p>That is, we can restrict attention to the typical set when computing expectations. The fact that typical sets exist is why we are able to compute posterior expectations using Monte Carlo methods—the draws from the posterior distribution we make with Monte Carlo methods will almost all fall in the typical set and we know that will be sufficient.</p>
 <p>We saw in the first plot in section 4 (draws are nowhere near the mode) that if we have $D$ i.i.d. draws from a standard normal, that the typical set was well bounded away from the posterior mode, which is at the origin. The next section shows that the distance from the mode reduces to a well-known distribution.</p>
 
