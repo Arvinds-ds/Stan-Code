@@ -1,0 +1,87 @@
+notes_max <- 10
+rate_max <- 5
+pm <- matrix( NA , nrow=rate_max+1 , ncol=notes_max+1 )
+for ( i in 1:(rate_max+1) )
+  for ( j in 1:(notes_max+1) )
+    pm[i,j] <- dpois( j-1 , lambda=i ) * (1/(rate_max+1))
+
+# basic case
+N_days <- 7
+alpha <- 20
+beta <- 10
+cat <- sample( 0:1 , size=N_days , prob=c(0.5,0.5) , replace=TRUE )
+notes <- rpois( N_days , lambda=(1-cat)*alpha + cat*beta )
+
+library(rethinking) # needs Experimental branch (as of 19 April 2017)
+dat_list <- list(notes=notes,cat=cat)
+
+m1 <- map2stan(
+  alist(
+    notes ~ poisson(lambda),
+    lambda <- (1-cat)*alpha + cat*beta,
+    alpha ~ exponential(0.1),
+    beta ~ exponential(0.1)
+  ),
+  constraints=list(alpha="lower=0",beta="lower=0"),
+  data=dat_list )
+
+dat_list_glmm <- dat_list
+dat_list_glmm$id <- c(1,1,2,3,3,4,5)
+
+mx <- map2stan(
+  alist(
+    notes ~ poisson(lambda),
+    lambda <- (1-cat)*alpha[id] + cat*beta[id],
+    alpha[id] ~ exponential("1.0/alpha_bar"),
+    beta[id] ~ exponential("1.0/beta_bar"),
+    alpha_bar ~ exponential(0.1),
+    beta_bar ~ exponential(0.1)
+  ),
+  constraints=list(alpha="lower=0",beta="lower=0",alpha_bar="lower=0",beta_bar="lower=0"),
+  data=dat_list_glmm , start=list(alpha=rep(1,5),beta=rep(1,5)) , sample=TRUE )
+
+cat_obs <- cat
+cat_obs[c(1,4)] <- NA
+dat_list2 <- list( notes=notes , cat=cat_obs )
+
+m2 <- map2stan(
+  alist(
+    notes ~ poisson(lambda),
+    lambda <- (1-cat)*alpha + cat*beta,
+    cat ~ bernoulli(kappa),
+    kappa ~ beta(4,4),
+    alpha ~ exponential(0.1),
+    beta ~ exponential(0.1)
+  ),
+  constraints=list(alpha="lower=0",beta="lower=0",kappa="lower=0,upper=1"),
+  data=dat_list2)
+
+cat_obs <- cat
+cat_obs[c(1,4)] <- -1
+dat_list4 <- list( notes=notes , cat=cat_obs , N=N_days )
+
+m_miss <- stan( model_code=mcatmiss_code , data=dat_list4 , chains=1 )
+
+# measurement error (occupancy model)
+# half of time, present cat not observed by data collector, but seen by bird
+cat_obs <- ifelse( cat==0 , 0 , ifelse(runif(N_days)<0.5,0,1) )
+
+dat_list3 <- list(
+  notes=notes,
+  cat_true=ifelse(cat_obs==1,1,NA),
+  cat_obs=cat_obs
+)
+
+m3 <- map2stan(
+  alist(
+    notes ~ poisson(lambda),
+    lambda <- (1-cat_true)*alpha + cat_true*beta,
+    cat_obs ~ bernoulli( cat_true*delta ),
+    cat_true ~ bernoulli(kappa),
+    kappa ~ beta(4,4),
+    delta ~ beta(4,4),
+    alpha ~ exponential(0.1),
+    beta ~ exponential(0.1)
+  ),
+  constraints=list(alpha="lower=0",beta="lower=0"),
+  data=dat_list3 )
